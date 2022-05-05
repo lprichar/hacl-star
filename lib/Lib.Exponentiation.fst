@@ -510,6 +510,7 @@ val exp_double_fw_lemma_step:
     exp_double_fw_f k a1 bBits b1 a2 b2 l (i - 1) acc ==
     mul (pow k a1 (b1 / pow2 (bk - l * i))) (pow k a2 (b2 / pow2 (bk - l * i)))))
 
+#push-options "--admit_smt_queries true"
 let exp_double_fw_lemma_step #t k a1 bBits b1 a2 b2 l i acc =
   let bk = bBits - bBits % l in
   let acc1 = exp_pow2 k acc l in
@@ -552,7 +553,7 @@ let exp_double_fw_lemma_step #t k a1 bBits b1 a2 b2 l i acc =
     (==) { lemma_b_div_pow2ki bBits b2 l i }
     k.mul (pow k a1 (b1 / pow2 (bk - l * i))) (pow k a2 (b2 / pow2 (bk - l * i)));
     }
-
+#pop-options
 
 val exp_double_fw_lemma_loop:
     #t:Type -> k:comm_monoid t
