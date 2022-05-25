@@ -1,10 +1,10 @@
 {
   inputs = {
-    fstar-src.url     = github:fstarlang/fstar?ref=master;
+    fstar-src.url     = github:fstarlang/fstar/master
     fstar-src.flake   = false;
-    karamel-src.url   = github:fstarlang/karamel?ref=master;
+    karamel-src.url   = github:fstarlang/karamel/master;
     karamel-src.flake = false;
-    
+
     everest = {
       url = github:project-everest/everest-nix?dir=projects;
       inputs.fstar-src.follows    = "fstar-src";
@@ -12,10 +12,7 @@
       # `/` means `self` (see NixOS/nix#4931)
       inputs.hacl-src.follows     = "/";
     };
-
-    flake-utils.url = "flake-utils";
-    nixpkgs.url = "nixpkgs";
   };
 
-  outputs = {everest, ...}: everest;
+  outputs = { everest, ... }: everest;
 }
