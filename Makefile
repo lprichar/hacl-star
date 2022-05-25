@@ -746,7 +746,10 @@ BUNDLE_FLAGS	=\
   $(INTTYPES_128_BUNDLE) \
   $(RSAPSS_BUNDLE) \
   $(FFDHE_BUNDLE) \
-  $(LEGACY_BUNDLE)
+  $(LEGACY_BUNDLE) \
+  $(AES_BUNDLE) \
+  $(GF128_BUNDLE) \
+  $(AES_GCM_BUNDLE)
 
 DEFAULT_FLAGS = \
   $(HAND_WRITTEN_LIB_FLAGS) \
@@ -757,6 +760,10 @@ DEFAULT_FLAGS = \
   $(BUNDLE_FLAGS) \
   $(REQUIRED_FLAGS) \
   $(TARGET_H_INCLUDE)
+
+IGNORE_AES_BUNDLE = -bundle Hacl.AES_128.*,Hacl.AES_256.*,Hacl.Impl.*
+IGNORE_GF128_BUNDLE = -bundle Hacl.Impl.Gf128.*,Hacl.Gf128.*
+IGNORE_AES_GCM_BUNDLE = -bundle Hacl.AES_128_GCM.*,Hacl.AES_256_GCM.*
 
 # WASM distribution
 # -----------------
@@ -822,6 +829,11 @@ dist/wasm/Makefile.basic: BLAKE2_BUNDLE = $(BLAKE2_BUNDLE_BASE) \
   -bundle 'Hacl.Hash.Blake2s_128,Hacl.Blake2s_128,Hacl.Hash.Blake2b_256,Hacl.Blake2b_256' \
   -bundle 'Hacl.HMAC.Blake2s_128,Hacl.HMAC.Blake2b_256,Hacl.HKDF.Blake2s_128,Hacl.HKDF.Blake2b_256' \
   -bundle 'Hacl.Streaming.Blake2s_128,Hacl.Streaming.Blake2b_256'
+
+# Disabling AES
+dist/wasm/Makefile.basic: AES_BUNDLE = $(IGNORE_AES_BUNDLE)
+dist/wasm/Makefile.basic: GF128_BUNDLE = $(IGNORE_GF128_BUNDLE)
+dist/wasm/Makefile.basic: AES_GCM_BUNDLE = $(IGNORE_AES_GCM_BUNDLE)
 
 dist/wasm/Makefile.basic: STREAMING_BUNDLE = -bundle Hacl.Streaming.*
 
@@ -921,6 +933,11 @@ dist/c89-compatible/Makefile.basic: MERKLE_BUNDLE = -bundle 'MerkleTree.*,Merkle
 dist/c89-compatible/Makefile.basic: DEFAULT_FLAGS += -fc89 -ccopt -std=c89 -ccopt -Wno-typedef-redefinition
 
 
+# Disabling AES
+dist/ccf/Makefile.basic: AES_BUNDLE = $(IGNORE_AES_BUNDLE)
+dist/ccf/Makefile.basic: GF128_BUNDLE = $(IGNORE_GF128_BUNDLE)
+dist/ccf/Makefile.basic: AES_GCM_BUNDLE = $(IGNORE_AES_GCM_BUNDLE)
+
 # Election Guard distribution
 # ---------------------------
 #
@@ -983,6 +1000,11 @@ dist/mozilla/Makefile.basic: HAND_WRITTEN_FILES =
 dist/mozilla/Makefile.basic: TARGETCONFIG_FLAGS =
 dist/mozilla/Makefile.basic: HAND_WRITTEN_LIB_FLAGS =
 dist/mozilla/Makefile.basic: TARGET_H_INCLUDE = -add-early-include '<stdbool.h>'
+
+# Disabling AES
+dist/mozilla/Makefile.basic: AES_BUNDLE = $(IGNORE_AES_BUNDLE)
+dist/mozilla/Makefile.basic: GF128_BUNDLE = $(IGNORE_GF128_BUNDLE)
+dist/mozilla/Makefile.basic: AES_GCM_BUNDLE = $(IGNORE_AES_GCM_BUNDLE)
 
 # Portable distribution
 # ---------------------
