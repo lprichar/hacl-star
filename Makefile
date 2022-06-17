@@ -692,6 +692,12 @@ INTRINSIC_FLAGS = \
   \
   -add-include 'Hacl_Hash_Blake2b_256:"libintvector.h"' \
   -add-include 'Hacl_Poly1305_256:"libintvector.h"' \
+  \
+  -add-include 'Hacl_AES_128_NI:"libintvector.h"' \
+  -add-include 'Hacl_AES_256_NI:"libintvector.h"' \
+  -add-include 'Hacl_AES_128_GCM_NI:"libintvector.h"' \
+  -add-include 'Hacl_AES_256_GCM_NI:"libintvector.h"' \
+  -add-include 'Hacl_Gf128_NI:"libintvector.h"' \
 
 # Disabled for distributions that don't include code based on intrinsics.
 INTRINSIC_INT_FLAGS = \
