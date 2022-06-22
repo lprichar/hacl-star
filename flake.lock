@@ -1,0 +1,97 @@
+{
+  "nodes": {
+    "everest": {
+      "inputs": {
+        "flake-utils": "flake-utils",
+        "fstar-src": "fstar-src",
+        "hacl-src": [],
+        "karamel-src": "karamel-src",
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "dir": "projects",
+        "lastModified": 1655860689,
+        "narHash": "sha256-fWTtcr5IPhKoHn6aANiyMCIbCUmPmJ+DPRZKhQtn4X0=",
+        "owner": "project-everest",
+        "repo": "everest-nix",
+        "rev": "351bc93a57df91b67fb1e2d2ca4bddffa79a3f5b",
+        "type": "github"
+      },
+      "original": {
+        "dir": "projects",
+        "owner": "project-everest",
+        "repo": "everest-nix",
+        "type": "github"
+      }
+    },
+    "flake-utils": {
+      "locked": {
+        "lastModified": 1653893745,
+        "narHash": "sha256-0jntwV3Z8//YwuOjzhV2sgJJPt+HY6KhU7VZUL0fKZQ=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "1ed9fb1935d260de5fe1c2f7ee0ebaae17ed2fa1",
+        "type": "github"
+      },
+      "original": {
+        "id": "flake-utils",
+        "type": "indirect"
+      }
+    },
+    "fstar-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1655466380,
+        "narHash": "sha256-6gkswzgFPrjEUmQXBvj8IRuXKmFE/gkYN9dl4KNRuxU=",
+        "owner": "fstarlang",
+        "repo": "fstar",
+        "rev": "ce562bf77ed59c3c7735d69a2b00ef9da0c8867c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "fstarlang",
+        "repo": "fstar",
+        "type": "github"
+      }
+    },
+    "karamel-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1654708613,
+        "narHash": "sha256-fW/Q2FY+uQQOAOXmBdWGZ+nHX6MoPYfutaU1Fd3xIEo=",
+        "owner": "fstarlang",
+        "repo": "karamel",
+        "rev": "28a9d4a64fbbdcd1fe12c07e65d4b82e63bb5106",
+        "type": "github"
+      },
+      "original": {
+        "owner": "fstarlang",
+        "repo": "karamel",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1655859864,
+        "narHash": "sha256-BnU7Pps4LqYgvHrknHrmfcVTeJxpfwEwOSXJo/gEGAI=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "8c5a263aa37becea16d9ec851bc028607b0c2345",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "master",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "everest": "everest"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
