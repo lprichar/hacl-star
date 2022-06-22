@@ -299,19 +299,42 @@ let rec circuit_def_lemma circ x i =
   | Not a -> circuit_def_lemma circ x a
 
 inline_for_extraction noextract
-val circuit_spec (#m #m':IT.size_nat) (circ:circuit m m') (#n:IT.size_nat) (#xN:sig n) (x:xNxM xN m) : xNxM xN m'
+val circuit_spec (#m #m':IT.size_nat) (circ:circuit m m') (#n:IT.size_nat) (#xN:sig n) (x:xNxM xN m) :
+  Pure
+    (xNxM xN m')
+    (requires True)
+    (ensures fun y -> forall (i:nat{i<m'}). index y i == circuit_def circ x i)
 inline_for_extraction noextract
-let circuit_spec circ x = xNxM_mk _ _ (circuit_def circ x)
+let circuit_spec #m #m' circ #n #xN x =
+  let rec aux (cur:nat{cur<=m'}) :
+    Pure
+      (xNxM xN m')
+      (requires True)
+      (ensures fun y -> forall (i:nat{i<cur}). index y i == circuit_def circ x i)
+    =
+    if cur = 0 then
+      xNxM_mk _ _ (fun _ -> (_).zeros_)
+    else
+      let y = aux (cur-1) in
+      let v : (v:xN.t{v == circuit_def circ x (cur-1)}) =
+        let g = circ (cur-1) in
+        match g with
+        | Input i -> index x i
+        | Zeros -> (_).zeros_
+        | Ones -> (_).ones_
+        | Xor a b -> (_).xor_ (index y a) (index y b)
+        | And a b -> (_).and_ (index y a) (index y b)
+        | Or a b -> (_).or_ (index y a) (index y b)
+        | Not a -> (_).not_ (index y a)
+      in
+      Seq.upd y (cur-1) v
+  in
+  aux m'
 
 val circuit_spec_lemma (#m #m':IT.size_nat) (circ:circuit m m') (#n:IT.size_nat) (#xN:sig n) (x:xNxM xN m) (i:nat{i<m'}) :
   Lemma (index (circuit_spec circ x) i == circuit_def circ x i)
   [SMTPat (index (circuit_spec circ x) i)]
 let circuit_spec_lemma circ x i = ()
-
-inline_for_extraction noextract
-val circuit_spec' (#m #m':IT.size_nat) (circ:circuit m m') (#n:IT.size_nat) (#xN:sig n) (x:xNxM xN m) : (y:xNxM xN m'{y == circuit_spec circ x})
-inline_for_extraction noextract
-let rec circuit_spec' #m #m' circ #n #xN x = admit ()
 
 private val sliceable_circuit_lemma
   (#m #m':IT.size_nat)
