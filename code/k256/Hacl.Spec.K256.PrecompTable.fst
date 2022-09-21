@@ -65,7 +65,7 @@ let rec precomp_basepoint_table_list_rec n i acc =
 
 
 let precomp_basepoint_table_list_aux : x:list uint64{List.Tot.length x = 240} =
-  snd (precomp_basepoint_table_list_rec 15 0 (Spec.K256.g, proj_point_to_list S.point_at_inf))
+  snd (Loops.repeat_right 0 15 g_i_acc_t precomp_basepoint_table_f (Spec.K256.g, proj_point_to_list S.point_at_inf))
 
 
 unfold let precomp_basepoint_table_list: x:list uint64{List.Tot.length x = 240} =
@@ -73,7 +73,10 @@ unfold let precomp_basepoint_table_list: x:list uint64{List.Tot.length x = 240} 
 
 
 let precomp_basepoint_table_lseq : lseq uint64 240 =
-  assert_norm (List.Tot.length precomp_basepoint_table_list == 240);
+  // assert_norm (List.Tot.length precomp_basepoint_table_list == 240); // assert_norm doesn't work
+  // assert (normalize (List.Tot.length precomp_basepoint_table_list == 240)); // doesn't work but needed for createL or createL_global  
+  normalize_term_spec (precomp_basepoint_table_list_aux);
+  assert (List.Tot.length precomp_basepoint_table_list == 240);
   Seq.seq_of_list precomp_basepoint_table_list
 
 
