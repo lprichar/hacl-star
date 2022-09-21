@@ -27,7 +27,7 @@ val table_select_consttime_f:
     #t:BD.limb_t
   -> len:size_t{v len > 0}
   -> table_len:size_t{1 < v table_len /\ v table_len * v len <= max_size_t}
-  -> table:lbuffer (uint_t t SEC) (table_len *! len)
+  -> table:clbuffer (uint_t t SEC) (table_len *! len)
   -> i:uint_t t SEC{v i < v table_len}
   -> j:size_t{v j < v table_len - 1}
   -> acc:lbuffer (uint_t t SEC) len ->
