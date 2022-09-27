@@ -17,6 +17,14 @@ module S = Hacl.Spec.Bignum.Convert
 
 #reset-options "--z3rlimit 50 --fuel 0 --ifuel 0"
 
+open FStar.Tactics
+
+let is_constant (x: term): Tac unit =
+  match inspect_ln x with
+  | Tv_Const _ -> exact (`true)
+  | _ -> exact (`false)
+
+
 inline_for_extraction noextract
 val bn_from_uint:
     #t:limb_t
@@ -186,11 +194,11 @@ let bn_to_bytes_be_st (t:limb_t) (len:size_t{0 < v len /\ numbytes t * v (blocks
 inline_for_extraction noextract
 val mk_bn_to_bytes_be:
     #t:limb_t
-  -> is_known_len:bool
-  -> len:size_t{0 < v len /\ numbytes t * v (blocks len (size (numbytes t))) <= max_size_t} ->
+  -> len:size_t{0 < v len /\ numbytes t * v (blocks len (size (numbytes t))) <= max_size_t}
+  -> #[is_constant (quote (FStar.Pervasives.norm [ delta; primops; iota ] len))] is_known_len:bool ->
   bn_to_bytes_be_st t len
 
-let mk_bn_to_bytes_be #t is_known_len len b res =
+let mk_bn_to_bytes_be #t len #is_known_len b res =
   push_frame ();
   if is_known_len then begin
     [@inline_let] let numb = size (numbytes t) in
@@ -212,17 +220,19 @@ let mk_bn_to_bytes_be #t is_known_len len b res =
   pop_frame ()
 
 
-[@CInline]
-let bn_to_bytes_be_uint32 len : bn_to_bytes_be_st U32 len = mk_bn_to_bytes_be #U32 false len
-let bn_to_bytes_be_uint64 len : bn_to_bytes_be_st U64 len = mk_bn_to_bytes_be #U64 false len
+val bn_to_bytes_be_uint32: len:_ -> bn_to_bytes_be_st U32 len
+let bn_to_bytes_be_uint32 len b res = mk_bn_to_bytes_be #U32 len b res
+
+val bn_to_bytes_be_uint64: len:_ -> bn_to_bytes_be_st U64 len
+let bn_to_bytes_be_uint64 len b res = mk_bn_to_bytes_be #U64 len b res
 
 
 inline_for_extraction noextract
 val bn_to_bytes_be: #t:_ -> len:_ -> bn_to_bytes_be_st t len
-let bn_to_bytes_be #t =
+let bn_to_bytes_be #t len =
   match t with
-  | U32 -> bn_to_bytes_be_uint32
-  | U64 -> bn_to_bytes_be_uint64
+  | U32 -> bn_to_bytes_be_uint32 len
+  | U64 -> bn_to_bytes_be_uint64 len
 
 
 inline_for_extraction noextract
@@ -239,11 +249,11 @@ let bn_to_bytes_le_st (t:limb_t) (len:size_t{0 < v len /\ numbytes t * v (blocks
 inline_for_extraction noextract
 val mk_bn_to_bytes_le:
     #t:limb_t
-  -> is_known_len:bool
-  -> len:size_t{0 < v len /\ numbytes t * v (blocks len (size (numbytes t))) <= max_size_t} ->
+  -> len:size_t{0 < v len /\ numbytes t * v (blocks len (size (numbytes t))) <= max_size_t}
+  -> #[is_constant (quote (FStar.Pervasives.norm [ delta; primops; iota ] len))] is_known_len:bool ->
   bn_to_bytes_le_st t len
 
-let mk_bn_to_bytes_le #t is_known_len len b res =
+let mk_bn_to_bytes_le #t len #is_known_len b res =
   push_frame ();
   if is_known_len then begin
     [@inline_let] let numb = size (numbytes t) in
@@ -265,10 +275,11 @@ let mk_bn_to_bytes_le #t is_known_len len b res =
   pop_frame ()
 
 
-[@CInline]
-let bn_to_bytes_le_uint32 len : bn_to_bytes_le_st U32 len = mk_bn_to_bytes_le #U32 false len
-[@CInline]
-let bn_to_bytes_le_uint64 len : bn_to_bytes_le_st U64 len = mk_bn_to_bytes_le #U64 false len
+val bn_to_bytes_le_uint32: len:_ -> bn_to_bytes_le_st U32 len
+let bn_to_bytes_le_uint32 len b res = mk_bn_to_bytes_le #U32 len b res
+
+val bn_to_bytes_le_uint64: len:_ -> bn_to_bytes_le_st U64 len
+let bn_to_bytes_le_uint64 len b res = mk_bn_to_bytes_le #U64 len b res
 
 
 inline_for_extraction noextract

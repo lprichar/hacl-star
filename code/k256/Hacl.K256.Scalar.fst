@@ -192,7 +192,7 @@ let load_qelem_modq f b =
 let store_qelem b f =
   let h0 = ST.get () in
   Hacl.Spec.Bignum.Convert.bn_to_bytes_be_lemma #U64 32 (as_seq h0 f);
-  Hacl.Bignum.Convert.mk_bn_to_bytes_be true 32ul f b
+  Hacl.Bignum.Convert.mk_bn_to_bytes_be 32ul f b
 
 
 [@CInline]

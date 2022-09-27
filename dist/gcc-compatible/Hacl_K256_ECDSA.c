@@ -428,12 +428,16 @@ static inline void load_qelem_modq(uint64_t *f, uint8_t *b)
 
 static inline void store_qelem(uint8_t *b, uint64_t *f)
 {
-  uint8_t tmp[32U] = { 0U };
-  KRML_MAYBE_FOR4(i,
-    (uint32_t)0U,
-    (uint32_t)4U,
-    (uint32_t)1U,
-    store64_be(b + i * (uint32_t)8U, f[(uint32_t)4U - i - (uint32_t)1U]););
+  uint32_t bnLen = (uint32_t)4U;
+  uint32_t tmpLen = (uint32_t)8U * bnLen;
+  KRML_CHECK_SIZE(sizeof (uint8_t), tmpLen);
+  uint8_t tmp[tmpLen];
+  memset(tmp, 0U, tmpLen * sizeof (uint8_t));
+  for (uint32_t i = (uint32_t)0U; i < bnLen; i++)
+  {
+    store64_be(tmp + i * (uint32_t)8U, f[bnLen - i - (uint32_t)1U]);
+  }
+  memcpy(b, tmp + tmpLen - (uint32_t)32U, (uint32_t)32U * sizeof (uint8_t));
 }
 
 static inline void qadd(uint64_t *out, uint64_t *f1, uint64_t *f2)
