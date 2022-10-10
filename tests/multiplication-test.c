@@ -37,14 +37,19 @@ int main()
     { 0xcc0d57376608ea8aU, 0x25731447e18a3f67U, 0x14ab93d4c2a7598bU, 0x1cc62c5e7c53e354U };
   uint64_t arg_t[8U] = { 0U };
   uint64_t arg_t2[8U] = { 0U };
+  uint64_t arg_t3[8U] = { 0U };
 
   bench_multiplication_buffer(arg_a, arg_b, arg_t);
   bench_bignum_mul(arg_a, arg_b, arg_t2);
+  new_bench_bignum_mul(arg_a, arg_b, arg_t3);
   compare64(8, arg_t, arg_t2);
+  compare64(8, arg_t, arg_t3);
 
   bench_sq(arg_a, arg_t);
   bench_bignum_sqr(arg_a, arg_t2);
+  new_bench_bignum_sqr(arg_a, arg_t3);
   compare64(8, arg_t, arg_t2);
+  compare64(8, arg_t, arg_t3);
 
   /* for (int i = 0; i < 4; i++) */
   /*   printf("%" PRIu64" %" PRIu64"\n", arg_a[i], arg_b[i]); */
@@ -93,6 +98,25 @@ int main()
 //////////////////////////////////////
 
   for (int j = 0; j < ROUNDS; j++){
+    new_bench_bignum_mul(arg_a, arg_b, arg_t);
+  }
+
+  t1 = clock();
+  a = cpucycles_begin();
+  for (int j = 0; j < ROUNDS; j++){
+    new_bench_bignum_mul(arg_a, arg_b, arg_t);
+  }
+  b = cpucycles_end();
+  t2 = clock();
+  clock_t tdiff6 = t2 - t1;
+  cycles cdiff6 = b - a;
+
+  printf("new-bn-mul\n");
+  print_time(count,tdiff6,cdiff6);
+
+//////////////////////////////////////
+
+  for (int j = 0; j < ROUNDS; j++){
     bench_sq(arg_a, arg_t);
   }
 
@@ -128,4 +152,22 @@ int main()
   printf("bn-sqr\n");
   print_time(count,tdiff3,cdiff3);
 
+//////////////////////////////////////
+
+  for (int j = 0; j < ROUNDS; j++){
+    new_bench_bignum_sqr(arg_a, arg_t);
+  }
+
+  t1 = clock();
+  a = cpucycles_begin();
+  for (int j = 0; j < ROUNDS; j++){
+    new_bench_bignum_sqr(arg_a, arg_t);
+  }
+  b = cpucycles_end();
+  t2 = clock();
+  clock_t tdiff5 = t2 - t1;
+  cycles cdiff5 = b - a;
+
+  printf("new-bn-sqr\n");
+  print_time(count,tdiff5,cdiff5);
 }
