@@ -38,12 +38,15 @@ int main()
   uint64_t arg_t[8U] = { 0U };
   uint64_t arg_t2[8U] = { 0U };
   uint64_t arg_t3[8U] = { 0U };
+  uint64_t arg_t4[8U] = { 0U };
 
   bench_multiplication_buffer(arg_a, arg_b, arg_t);
   bench_bignum_mul(arg_a, arg_b, arg_t2);
   new_bench_bignum_mul(arg_a, arg_b, arg_t3);
+  bench_bignum_mul_unroll1(arg_a, arg_b, arg_t4);
   compare64(8, arg_t, arg_t2);
   compare64(8, arg_t, arg_t3);
+  compare64(8, arg_t, arg_t4);
 
   bench_sq(arg_a, arg_t);
   bench_bignum_sqr(arg_a, arg_t2);
@@ -113,6 +116,25 @@ int main()
 
   printf("new-bn-mul\n");
   print_time(count,tdiff6,cdiff6);
+
+//////////////////////////////////////
+
+  for (int j = 0; j < ROUNDS; j++){
+    bench_bignum_mul_unroll1(arg_a, arg_b, arg_t);
+  }
+
+  t1 = clock();
+  a = cpucycles_begin();
+  for (int j = 0; j < ROUNDS; j++){
+    bench_bignum_mul_unroll1(arg_a, arg_b, arg_t);
+  }
+  b = cpucycles_end();
+  t2 = clock();
+  clock_t tdiff7 = t2 - t1;
+  cycles cdiff7 = b - a;
+
+  printf("new-bn-mul-unroll1\n");
+  print_time(count,tdiff7,cdiff7);
 
 //////////////////////////////////////
 
