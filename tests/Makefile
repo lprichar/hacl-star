@@ -85,6 +85,9 @@ curve64-rfc.exe: $(patsubst %.c,%.o,$(wildcard rfc7748_src/*.c))
 vec-128-test.exe: ../lib/c/libintvector.h vec-128-test.c
 	$(CC) -I../lib/c $(CFLAGS) $(CFLAGS_128) $(LDFLAGS) vec-128-test.c -o vec-128-test.exe
 
+multiplication-test.exe: multiplication.o multiplication-test.c
+	$(CC) -I. multiplication.o $(CFLAGS) $(LDFLAGS) multiplication-test.c -o multiplication-test.exe
+
 %.exe: %.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ ../dist/gcc-compatible/libevercrypt.a -o $@ -lcrypto
 
