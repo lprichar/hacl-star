@@ -62,7 +62,7 @@ void Hacl_Impl_Ed25519_PointNegate_point_negate(uint64_t *p, uint64_t *out);
 
 void Hacl_Impl_Ed25519_Ladder_make_point_inf(uint64_t *b);
 
-void Hacl_Impl_Ed25519_Ladder_point_mul(uint64_t *result, uint8_t *scalar, uint64_t *q);
+void Hacl_Impl_Ed25519_Ladder_point_mul(uint64_t *out, uint8_t *scalar, uint64_t *q);
 
 #if defined(__cplusplus)
 }
