@@ -23,17 +23,18 @@ module LSeq = Lib.Sequence
 ///
 
 inline_for_extraction noextract
-val bn_get_ith_bit:
-    #t:limb_t
-  -> len:size_t
-  -> b:lbignum t len
+let bn_get_ith_bit_st (t:limb_t) (len:size_t) =
+  b:lbignum t len
   -> i:size_t{v i / bits t < v len} ->
   Stack (limb t)
   (requires fun h -> live h b)
   (ensures  fun h0 r h1 -> h0 == h1 /\
     r == S.bn_get_ith_bit (as_seq h0 b) (v i))
 
-let bn_get_ith_bit #t len input ind =
+
+inline_for_extraction noextract
+val mk_bn_get_ith_bit: #t:_ -> len:_ -> bn_get_ith_bit_st t len
+let mk_bn_get_ith_bit #t len input ind =
   [@inline_let]
   let pbits = size (bits t) in
   let i = ind /. pbits in
@@ -42,6 +43,17 @@ let bn_get_ith_bit #t len input ind =
   assert (v j == v ind % bits t);
   let tmp = input.(i) in
   (tmp >>. j) &. uint #t 1
+
+
+let bn_get_ith_bit_u32 len: bn_get_ith_bit_st U32 len = mk_bn_get_ith_bit len
+let bn_get_ith_bit_u64 len: bn_get_ith_bit_st U64 len = mk_bn_get_ith_bit len
+
+inline_for_extraction noextract
+val bn_get_ith_bit: #t:_ -> len:_ -> bn_get_ith_bit_st t len
+let bn_get_ith_bit #t =
+  match t with
+  | U32 -> bn_get_ith_bit_u32
+  | U64 -> bn_get_ith_bit_u64
 
 
 inline_for_extraction noextract
@@ -171,10 +183,8 @@ let bn_get_bits_limb #t len n ind =
 
 
 inline_for_extraction noextract
-val bn_get_bits:
-    #t:limb_t
-  -> len:size_t
-  -> b:lbignum t len
+let bn_get_bits_st (t:limb_t) (len:size_t) =
+    b:lbignum t len
   -> i:size_t
   -> l:size_t{v l < bits t /\ v i / bits t < v len} ->
   Stack (limb t)
@@ -182,6 +192,21 @@ val bn_get_bits:
   (ensures  fun h0 r h1 -> h0 == h1 /\
     r == S.bn_get_bits (as_seq h0 b) (v i) (v l))
 
-let bn_get_bits #t len b i l =
+
+inline_for_extraction noextract
+val mk_bn_get_bits: #t:_ -> len:_ -> bn_get_bits_st t len
+let mk_bn_get_bits #t len b i l =
   let mask_l = (uint #t #SEC 1 <<. l) -. uint #t 1 in
   bn_get_bits_limb len b i &. mask_l
+
+
+let bn_get_bits_u32 len: bn_get_bits_st U32 len = mk_bn_get_bits len
+let bn_get_bits_u64 len: bn_get_bits_st U64 len = mk_bn_get_bits len
+
+
+inline_for_extraction noextract
+val bn_get_bits: #t:_ -> len:_ -> bn_get_bits_st t len
+let bn_get_bits #t =
+  match t with
+  | U32 -> bn_get_bits_u32
+  | U64 -> bn_get_bits_u64
