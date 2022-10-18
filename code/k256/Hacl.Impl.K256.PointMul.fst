@@ -150,6 +150,22 @@ let precomp_basepoint_table_lemma () =
 
 /////////////////////////////////////////////////////
 
+unfold let precomp_basepoint_table_list_w5: x:list uint64{FStar.List.Tot.length x = 480} =
+  normalize_term (SPT.precomp_base_table_list mk_k256_precomp_base_table S.g 31)
+
+inline_for_extraction noextract
+let precomp_basepoint_table_lseq_w5 : LSeq.lseq uint64 480 =
+  normalize_term_spec (SPT.precomp_base_table_list mk_k256_precomp_base_table S.g 31);
+  Seq.seq_of_list precomp_basepoint_table_list_w5
+
+val precomp_basepoint_table_lemma_w5: unit ->
+  Lemma (forall (i:nat{i < 32}). precomp_table_acc_inv 32 precomp_basepoint_table_lseq_w5 i)
+let precomp_basepoint_table_lemma_w5 () =
+  normalize_term_spec (SPT.precomp_base_table_list mk_k256_precomp_base_table S.g 31);
+  SPT.precomp_base_table_lemma mk_k256_precomp_base_table S.g 32 precomp_basepoint_table_lseq_w5
+
+/////////////////////////////////////////////////////
+
 inline_for_extraction noextract
 val make_g: g:point -> Stack unit
   (requires fun h -> live h g)
@@ -271,13 +287,29 @@ let point_mul_g out scalar =
   point_mul_g_noalloc out scalar g;
   pop_frame ()
 
+//////////////////////////////////////////////
+
+inline_for_extraction noextract
+let table_inv_w5 : BE.table_inv_t U64 15ul 32ul =
+  [@inline_let] let len = 15ul in
+  [@inline_let] let ctx_len = 0ul in
+  [@inline_let] let k = mk_k256_concrete_ops in
+  [@inline_let] let l = 5ul in
+  [@inline_let] let table_len = 32ul in
+  assert_norm (pow2 (v l) == v table_len);
+  BE.table_inv_precomp len ctx_len k l table_len
+
+let precomp_basepoint_table_w5:
+  x:glbuffer uint64 480ul{witnessed x precomp_basepoint_table_lseq_w5 /\ recallable x} =
+  createL_global precomp_basepoint_table_list_w5
+
 
 inline_for_extraction noextract
 val point_mul_g_double_vartime_noalloc:
     out:point
   -> scalar1:qelem -> q1:point
   -> scalar2:qelem -> q2:point
-  -> table2:lbuffer uint64 (16ul *! 15ul) ->
+  -> table2:lbuffer uint64 (32ul *! 15ul) ->
   Stack unit
   (requires fun h ->
     live h out /\ live h scalar1 /\ live h q1 /\
@@ -288,7 +320,7 @@ val point_mul_g_double_vartime_noalloc:
 
     qas_nat h scalar1 < S.q /\ qas_nat h scalar2 < S.q /\
     point_inv h q1 /\ point_eval h q1 == S.g /\ point_inv h q2 /\
-    table_inv (as_seq h q2) (as_seq h table2))
+    table_inv_w5 (as_seq h q2) (as_seq h table2))
   (ensures fun h0 _ h1 -> modifies (loc out) h0 h1 /\
     point_inv h1 out /\
     S.to_aff_point (point_eval h1 out) ==
@@ -299,30 +331,30 @@ let point_mul_g_double_vartime_noalloc out scalar1 q1 scalar2 q2 table2 =
   [@inline_let] let len = 15ul in
   [@inline_let] let ctx_len = 0ul in
   [@inline_let] let k = mk_k256_concrete_ops in
-  [@inline_let] let l = 4ul in
-  [@inline_let] let table_len = 16ul in
+  [@inline_let] let l = 5ul in
+  [@inline_let] let table_len = 32ul in
   [@inline_let] let bLen = 4ul in
   [@inline_let] let bBits = 256ul in
+  assert_norm (pow2 (v l) == v table_len);
 
   let h0 = ST.get () in
-  recall_contents precomp_basepoint_table precomp_basepoint_table_lseq;
+  recall_contents precomp_basepoint_table_w5 precomp_basepoint_table_lseq_w5;
   let h1 = ST.get () in
-  precomp_basepoint_table_lemma ();
-  assert (table_inv (as_seq h1 q1) (as_seq h1 precomp_basepoint_table));
-  assert (table_inv (as_seq h1 q2) (as_seq h1 table2));
+  precomp_basepoint_table_lemma_w5 ();
+  assert (table_inv_w5 (as_seq h1 q1) (as_seq h1 precomp_basepoint_table_w5));
+  assert (table_inv_w5 (as_seq h1 q2) (as_seq h1 table2));
 
   ME.mk_lexp_double_fw_tables len ctx_len k l table_len
-    table_inv table_inv
+    table_inv_w5 table_inv_w5
     (BE.lprecomp_get_vartime len ctx_len k l table_len)
     (BE.lprecomp_get_vartime len ctx_len k l table_len)
     (null uint64) q1 bLen bBits scalar1 q2 scalar2
-    (to_const precomp_basepoint_table) (to_const table2) out;
+    (to_const precomp_basepoint_table_w5) (to_const table2) out;
 
   SE.exp_double_fw_lemma S.mk_k256_concrete_ops
     (point_eval h0 q1) 256 (qas_nat h0 scalar1)
-    (point_eval h0 q2) (qas_nat h0 scalar2) 4
-
-
+    (point_eval h0 q2) (qas_nat h0 scalar2) 5
+    
 val point_mul_g_double_vartime: out:point -> scalar1:qelem -> scalar2:qelem -> q2:point ->
   Stack unit
   (requires fun h ->
@@ -341,8 +373,9 @@ let point_mul_g_double_vartime out scalar1 scalar2 q2 =
   [@inline_let] let len = 15ul in
   [@inline_let] let ctx_len = 0ul in
   [@inline_let] let k = mk_k256_concrete_ops in
-  [@inline_let] let table_len = 16ul in
-
+  [@inline_let] let table_len = 32ul in
+  assert_norm (pow2 5 == v table_len);
+  
   let q1 = create 15ul (u64 0) in
   make_g q1;
 
